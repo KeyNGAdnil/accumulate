@@ -5,3 +5,6 @@
 ### Javascript
 
 ### React
+
+[测试](https://github.com/KeyNGAdnil/accumulate/blob/master/测试.md)
+
