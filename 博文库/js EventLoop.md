@@ -14,6 +14,11 @@
 
 当**幕后线程**（background thread）里的代码执行完成后(比如setTimeout时间到了，ajax请求得到响应),该线程就会将它的回调函数放到任务队列（又称作事件队列、消息队列）中等待执行。而当主线程执行完栈中的所有代码后，它就会检查任务队列是否有任务要执行，如果有任务要执行的话，那么就将该任务放到执行栈中执行。如果当前任务队列为空的话，它就会一直循环等待任务到来。因此，这叫做**事件循环**。
 
+**两个细节**：
+
+1. 引擎执行任务时永远不会进行渲染（render）。如果任务执行需要很长一段时间也没关系。仅在任务完成后才会绘制对 DOM 的更改。
+2. 如果一项任务执行花费的时间过长，浏览器将无法执行其他任务，无法处理用户事件，因此，在一定时间后浏览器会在整个页面抛出一个如“页面未响应”之类的警报，建议你终止这个任务。这种情况常发生在有大量复杂的计算或导致死循环的程序错误时。
+
 ### 3.任务队列
 
 从上图中可以看出JavaScript是有两个任务队列的，一个叫做 Macrotask Queue(Task Queue) 大任务, 一个叫做 Microtask Queue 小任务，也就是常说的宏任务和微任务。
@@ -43,7 +48,7 @@
 
 ![](https://segmentfault.com/img/bVbpsFp?w=392&h=740)
 
-### 4.示例
+### 4.示例解释
 
 ```javascript
  console.log(1)
@@ -104,6 +109,48 @@ console.log(9)
 - **第四次事件循环:**
 
 从macrotask队列里取位于队首的任务(settimeout2)并执行,输出10，并且执行new Promise内的函数(new Promise内的函数是同步操作，并不是异步操作),输出11，并且将它的两个then函数加入microtask队列 从microtask队列中，取队首的任务执行，直到为空为止。因此，两个新增的microtask任务按顺序执行，输出12和13，并且将setinterval1清空。
+
+### 5.任务轮询
+
+通过setTimeout的方式递归调用run函数进行i的自增。每次自增都会在宏任务的队列中进行。
+
+```javascript
+function handle() {
+    let i = 0;
+    (function run() {
+        hd.innerHTML = i;
+        hd.style.width = i + "%"
+        if (++i <= 100) {
+            setTimeout(run, 20);
+        }
+    })()
+}
+handle();
+```
+
+
+
+### 6.任务拆分成多个子任务
+
+通过委托宏任务的队列的方式可以进行切片式的处理一个累加巨大数字的问题，这样的方式可以比直接在同步队列处理更快，防止了浏览器线程阻塞。
+
+```javascript
+let num = 987654321;
+let count = 0;
+function countSum() {
+    for (let i = 0; i < 100000000; i++) {
+        if (num <= 0) break;
+        count += num--;
+    }
+    if (num > 0) {
+        console.log(num);
+        setTimeout(countSum);
+    } else {
+        console.log("总计：" + count);
+    }
+}
+countSum();
+```
 
 
 
