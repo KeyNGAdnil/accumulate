@@ -65,3 +65,22 @@ function createObj(o) {
     clone.sayName = function () { }//拓展新方法
     return clone;
 }
+// 5.寄生组合继承
+function Parent(name) {
+    this.name = name
+    this.sayName = function () {
+        console.log(this.name)
+    }
+}
+
+Parent.prototype.age = 20
+Parent.ptototype.sayAge = function () {
+    console.log(this.age)
+}
+
+function Child(name) {
+    Parent.call(this, name)
+}
+
+Child.prototype = Object.create(Parent.prototype);
+Child.prototype.constructor = Child;
