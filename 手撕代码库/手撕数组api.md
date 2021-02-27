@@ -103,7 +103,3 @@ Array.prototype.map = function(callback, thisArg){
 }
 ```
 
-
-
-## slice
-
