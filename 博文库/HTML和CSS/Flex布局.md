@@ -54,7 +54,7 @@ align-items: flex-start(起点对齐) | flex-end(终点对齐) | center(居中) 
 
 - **align-content**：控制子项所组成的行(列)在侧轴的对齐方式
 
-```text
+```css
 属性同 justify-content 几乎一致
 flex-start | flex-end | center | space-between | space-around | stretch;
 属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用
